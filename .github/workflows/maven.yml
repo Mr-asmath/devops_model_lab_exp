@@ -24,11 +24,34 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: List files for debugging
-        run: ls -la
+      - name: Debug - List all files and directories
+        run: |
+          echo "Current working directory:"
+          pwd
+          echo ""
+          echo "All files and directories (including hidden):"
+          ls -la
+          echo ""
+          echo "Directory structure (first 2 levels):"
+          find . -maxdepth 2 -type d | sort
+          echo ""
+          echo "Searching for pom.xml files:"
+          find . -name "pom.xml" -type f
 
       - name: Build with Maven
-        # Change 'backend' to your actual subdirectory name
         run: |
-          cd backend
-          mvn -B package
+          # If pom.xml is in current directory
+          if [ -f "pom.xml" ]; then
+            echo "Found pom.xml in root directory"
+            mvn -B package
+          # If pom.xml is in a subdirectory (find first level pom.xml)
+          elif [ -f $(find . -maxdepth 2 -name "pom.xml" -type f | head -1) ]; then
+            POM_DIR=$(dirname $(find . -maxdepth 2 -name "pom.xml" -type f | head -1))
+            echo "Found pom.xml in: $POM_DIR"
+            cd $POM_DIR
+            mvn -B package
+          else
+            echo "Error: No pom.xml found in root or first level subdirectories"
+            echo "Please check the repository structure above"
+            exit 1
+          fi
