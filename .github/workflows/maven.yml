@@ -1,25 +1,32 @@
 name: Java CI with Maven
 
-# This section is mandatory
 on:
   push:
-    branches: [ "main" ]    # Run when you push code to main
+    branches: [ "main" ]    # Change "main" if your branch is named "master"
   pull_request:
-    branches: [ "main" ]    # Run when a pull request is opened against main
-  workflow_dispatch:        # Optional: Adds a "Run workflow" button in the UI
+    branches: [ "main" ]
+  workflow_dispatch:        # Allows you to run this manually from the Actions tab
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # Resolves the Node.js 20 deprecation warnings
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
-      - uses: actions/checkout@v4
+      # Use v6+ for checkout to ensure Node 24 support
+      - uses: actions/checkout@v6 
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.2.0
         with:
-          java-version: '17'
+          java-version: '17'      # Change this to '11' or '21' if needed
           distribution: 'temurin'
           cache: maven
+
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        # We removed --file pom.xml to let Maven find it automatically in the root
+        # If your project is in a subfolder, use: cd folder_name && mvn -B package
+        run: mvn -B package
