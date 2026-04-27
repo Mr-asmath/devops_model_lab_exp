@@ -23,50 +23,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Debug - Find all Java files
-        run: |
-          echo "Current directory:"
-          pwd
-          echo ""
-          echo "All files in repository:"
-          ls -la
-          echo ""
-          echo "Searching for all .java files:"
-          find . -name "*.java" -type f
-          echo ""
-          echo "Full directory structure:"
-          find . -type d | sort
-
       - name: Compile Java program
-        run: |
-          # Check different possible locations for App.java
-          if [ -f "com/example/App.java" ]; then
-            echo "Found at com/example/App.java"
-            javac com/example/App.java
-          elif [ -f "src/main/java/com/example/App.java" ]; then
-            echo "Found at src/main/java/com/example/App.java"
-            javac src/main/java/com/example/App.java
-          elif [ -f "App.java" ]; then
-            echo "Found at App.java in root"
-            javac App.java
-          else
-            echo "ERROR: App.java not found!"
-            echo "Please check the debug output above to see where your .java files are located"
-            exit 1
-          fi
+        run: javac src/main/java/com/example/App.java
 
       - name: Run Java program
-        run: |
-          if [ -f "com/example/App.class" ]; then
-            echo "Running from com/example/"
-            java com.example.App
-          elif [ -f "src/main/java/com/example/App.class" ]; then
-            echo "Running from src/main/java/com/example/"
-            java -cp src/main/java com.example.App
-          elif [ -f "App.class" ]; then
-            echo "Running from root"
-            java App
-          else
-            echo "ERROR: Compiled class file not found!"
-            exit 1
-          fi
+        run: java -cp src/main/java com.example.App
