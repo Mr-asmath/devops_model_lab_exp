@@ -1,17 +1,24 @@
+name: Java CI with Maven
+
+# This section is mandatory
+on:
+  push:
+    branches: [ "main" ]    # Run when you push code to main
+  pull_request:
+    branches: [ "main" ]    # Run when a pull request is opened against main
+  workflow_dispatch:        # Optional: Adds a "Run workflow" button in the UI
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Force the runner to use Node.js 24 to clear the deprecation warning
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
-
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      # Use latest versions that support Node 24
-      - uses: actions/checkout@v4.2.2 
-      - name: Set up JDK
-        uses: actions/setup-java@v4.5.0 
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          java-version: '17' # Ensure this matches your project
+          java-version: '17'
           distribution: 'temurin'
           cache: maven
       - name: Build with Maven
