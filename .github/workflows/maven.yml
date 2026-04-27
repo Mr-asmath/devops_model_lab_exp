@@ -22,50 +22,51 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
 
-      - name: Debug - List all files and directories
+      - name: Debug - Find all Java files
         run: |
-          echo "Current working directory:"
+          echo "Current directory:"
           pwd
           echo ""
-          echo "All files and directories (including hidden):"
+          echo "All files in repository:"
           ls -la
           echo ""
-          echo "Directory structure (first 2 levels):"
-          find . -maxdepth 2 -type d | sort
-          echo ""
-          echo "Searching for Java files:"
+          echo "Searching for all .java files:"
           find . -name "*.java" -type f
+          echo ""
+          echo "Full directory structure:"
+          find . -type d | sort
 
       - name: Compile Java program
         run: |
-          echo "=== Compiling ==="
-          # Create directory structure if needed
-          mkdir -p target/classes
-          
-          # Find and compile Java files
-          if [ -d "src/main/java" ]; then
-            javac -d target/classes $(find src/main/java -name "*.java")
+          # Check different possible locations for App.java
+          if [ -f "com/example/App.java" ]; then
+            echo "Found at com/example/App.java"
+            javac com/example/App.java
+          elif [ -f "src/main/java/com/example/App.java" ]; then
+            echo "Found at src/main/java/com/example/App.java"
+            javac src/main/java/com/example/App.java
           elif [ -f "App.java" ]; then
-            javac -d target/classes App.java
-          elif [ -f "com/example/App.java" ]; then
-            javac -d target/classes com/example/App.java
+            echo "Found at App.java in root"
+            javac App.java
           else
-            echo "No Java files found!"
+            echo "ERROR: App.java not found!"
+            echo "Please check the debug output above to see where your .java files are located"
             exit 1
           fi
 
       - name: Run Java program
         run: |
-          echo "=== Running ==="
-          if [ -d "src/main/java" ]; then
-            java -cp target/classes com.example.App
-          elif [ -f "App.java" ]; then
-            java -cp target/classes App
-          elif [ -f "com/example/App.java" ]; then
-            java -cp target/classes com.example.App
+          if [ -f "com/example/App.class" ]; then
+            echo "Running from com/example/"
+            java com.example.App
+          elif [ -f "src/main/java/com/example/App.class" ]; then
+            echo "Running from src/main/java/com/example/"
+            java -cp src/main/java com.example.App
+          elif [ -f "App.class" ]; then
+            echo "Running from root"
+            java App
           else
-            echo "Cannot find main class!"
+            echo "ERROR: Compiled class file not found!"
             exit 1
           fi
