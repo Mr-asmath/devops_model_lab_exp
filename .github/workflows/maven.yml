@@ -24,7 +24,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Compile Java program
-        run: javac src/main/java/com/example/App.java
+        run: javac my-app/src/main/java/com/example/App.java
 
       - name: Run Java program
-        run: java -cp src/main/java com.example.App
+        run: java -cp my-app/src/main/java com.example.App
