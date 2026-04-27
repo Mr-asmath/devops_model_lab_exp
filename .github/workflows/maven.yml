@@ -35,28 +35,37 @@ jobs:
           echo "Directory structure (first 2 levels):"
           find . -maxdepth 2 -type d | sort
           echo ""
-          echo "Searching for pom.xml files:"
-          find . -name "pom.xml" -type f
+          echo "Searching for Java files:"
+          find . -name "*.java" -type f
 
-      - name: Build with Maven
+      - name: Compile Java program
         run: |
-          # If pom.xml is in current directory
-          if [ -f "pom.xml" ]; then
-            echo "Found pom.xml in root directory"
-            mvn -B package
-          # If pom.xml is in a subdirectory (find first level pom.xml)
-          elif [ -f $(find . -maxdepth 2 -name "pom.xml" -type f | head -1) ]; then
-            POM_DIR=$(dirname $(find . -maxdepth 2 -name "pom.xml" -type f | head -1))
-            echo "Found pom.xml in: $POM_DIR"
-            cd $POM_DIR
-            mvn -B package
+          echo "=== Compiling ==="
+          # Create directory structure if needed
+          mkdir -p target/classes
+          
+          # Find and compile Java files
+          if [ -d "src/main/java" ]; then
+            javac -d target/classes $(find src/main/java -name "*.java")
+          elif [ -f "App.java" ]; then
+            javac -d target/classes App.java
+          elif [ -f "com/example/App.java" ]; then
+            javac -d target/classes com/example/App.java
           else
-            echo "Error: No pom.xml found in root or first level subdirectories"
-            echo "Please check the repository structure above"
+            echo "No Java files found!"
             exit 1
           fi
-          
+
       - name: Run Java program
         run: |
-            echo "=== Running ==="
-            java -cp src/main/java com.example.App
+          echo "=== Running ==="
+          if [ -d "src/main/java" ]; then
+            java -cp target/classes com.example.App
+          elif [ -f "App.java" ]; then
+            java -cp target/classes App
+          elif [ -f "com/example/App.java" ]; then
+            java -cp target/classes com.example.App
+          else
+            echo "Cannot find main class!"
+            exit 1
+          fi
